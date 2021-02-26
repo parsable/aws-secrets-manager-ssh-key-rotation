@@ -44,13 +44,13 @@ def lambda_handler(event, context):
 
     global TARGETS
     TARGETS = [
-            {
-                "Key" : "tag:" + tag_name,
-                "Values" : [
-                    tag_value
-                    ]
-                }
-            ]
+           {
+               "Key" : "tag:" + tag_name,
+               "Values" : [
+                   tag_value
+                   ]
+               }
+           ]
 
     print(json.dumps(TARGETS))
     arn = event['SecretId']
@@ -58,9 +58,11 @@ def lambda_handler(event, context):
     step = event['Step']
 
     # Setup the client
+    print("Set up client")
     service_client = boto3.client('secretsmanager')
 
     # Make sure the version is staged correctly
+    print("Check version")
     metadata = service_client.describe_secret(SecretId=arn)
     if not metadata['RotationEnabled']:
         print("Secret %s is not enabled for rotation." % arn)
@@ -77,6 +79,7 @@ def lambda_handler(event, context):
         raise ValueError("Secret version %s not set as AWSPENDING for rotation of secret %s." % (token, arn))
 
     if step == "createSecret":
+        print("Enter create secret loop")
         create_secret(service_client, arn, token, context)
 
     elif step == "setSecret":
@@ -110,8 +113,9 @@ def create_secret(service_client, arn, token, context):
 
     """
     # Make sure the current secret exists
+    print("Enter create secret")
     current_dict = get_secret_dict(service_client, arn, "AWSCURRENT")
-
+    print("Execute get_secret_dict")
     # Now try to get the secret version, if that fails, put a new secret
     try:
         service_client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")

@@ -1,0 +1,11 @@
+# JSON files
+**/*.json
+
+# IDEA
+**/.idea
+
+# Zips
+**/*.zip
+
+# PEMS
+**/*.pem
